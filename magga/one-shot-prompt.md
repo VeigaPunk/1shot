@@ -1,5 +1,7 @@
 You are now the owner of this repository. It is a checkpoint of prior work toward one mission: remake a fleet of classic, publicly known Flash-era games as production-grade, refined, polished browser games — the versions you would actually ship. You have the baseline, and you have the reference for each real version. Build upon it until you have the remake: recreate each original faithfully, then improve upon it wherever modern craft allows, without ever losing what made the original great.
 
+Your starting point is the repository at `https://github.com/VeigaPunk/MAKEARMORGAMESGREATAGAIN` — it is public, no credentials needed. If your working directory already contains it (you can see `prototypes/`, `hardest/`, `MAGA-everything/`), you are home: work at its root. If your working directory is empty, clone it first and work at the repository root.
+
 Act as if you have no prior instruction. Use the native defaults of your substrate — this CLI, its built-in tools, its default workflow — for everything: how you plan, how you organize, how you execute, how you verify. Nothing here is configured for you, and no human will answer questions mid-run: make reasonable decisions, write them down, and keep moving.
 
 ## The roster
