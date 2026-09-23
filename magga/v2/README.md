@@ -1,112 +1,162 @@
 # ds4cc-MAGGA v2
 
-**EVERYTHING IS PC x Make Love Not Warcraft** · DLC brief, revision 1
+**MAKE ARMORGAMES GREAT AGAIN** · *EVERYTHING IS PC x Make Love Not Warcraft* ·
+benchmark definition **0.2.0**
 
-A quality, creative, multimodal benchmark you can actually interact with.
-The arcade is the deliverable. Play it, hear it, find its failures, inspect
-how it was made, and feel the difference between renditions.
+> Take the checkpoint for legendary Flash-era games, with all the back
+> infrastructure built, the full commit audit and traces. Take the checkpoint
+> status and ship the final deliverable for each. In a one-shot prompt, with
+> native substrate capabilities.
 
-V1 asks how well a model can finish six classic games from a shared checkpoint.
-This DLC asks how well it can create a connected original world across animated
-comedy, fantasy adventure and a collectible-card game. V1's six-game challenge
-and historical prompt remain intact. A v2 run ships these three new experiences;
-it is not required to remake the six again. The DLC expands the MAGGA collection.
+A quality, creative, multimodal benchmark that you can actually play. The
+public deliverable is the arcade at **ds4cc.com/magga**: play the games, hear
+them, find where they break, and inspect how they were made.
 
-## The creative brief
+## The three inputs
 
-An original cast has ordinary lives, oversized fantasy alter egos, and a card
-game that turns their exploits into local mythology. The same character should
-be recognizable as an animated townsperson, an adventurer and a card illustration.
-Choices and events travel between those forms. Each experience also works when
-someone launches it directly from the arcade.
+Every run gets the same three things. Nothing else is held fixed.
 
-South Park supplies the reference for expressive cutout staging, comic timing
-and the collision of mundane life with absurd stakes. Vanilla World of Warcraft
-supplies the sense of place, class identity, dangerous travel, equipment and
-adventure. Hearthstone supplies the tactile card table, legible interactions,
-deckbuilding and audiovisual pleasure of playing a card. These are references
-for craft, not a request for their characters, assets or entire content catalogs.
+1. **The references.** Seven games that shipped long ago on infrastructure
+   nobody can build on anymore: Flash, dead portals, old desktop builds.
+   Everyone can remember them, and nobody can ship them as they were.
+2. **The checkpoint package.** `VeigaPunk/MAKEARMORGAMESGREATAGAIN-v2` is a
+   proprietary, half-done deliverable: design dossiers, specs, a monorepo,
+   prototypes, a near-complete level game, verification rounds, and the full
+   git trail of a day of live multi-model work, dead ends included. It runs,
+   and it is not finished.
+3. **The one-shot prompt.** [one-shot-prompt.md](one-shot-prompt.md), the same
+   bytes for every model and substrate.
 
-Let the creator decide what “PC” means in its world, what it finds funny, and
-how the story unfolds. The title does not prescribe a political position, plot,
-renderer or house style. The original cast and the actual play must carry it.
+Nothing tells the model how to get from 2 to 1. It has to read the checkpoint,
+check it against the references, decide which parts of the path to keep, and
+ship.
 
-## A complete release
+## What v2 changes
 
-These are authored-content floors for this revision, not measures of quality.
-Duplicated encounters, renamed cards and repeated dialogue do not satisfy them.
-The [builder prompt](one-shot-prompt.md) contains the same requirements.
+The roster, the mission and the half-done-package format are unchanged from
+v1. Three things change.
 
-| Experience | Required scope |
-|---|---|
-| Animated town comedy | One complete playable episode; at least 4 recurring characters, 3 locations and 6 staged scenes; at least 2 choices with later consequences; an ending. |
-| Fantasy adventure | At least 3 distinct playable class builds, 3 explorable regions, 6 authored quests and a dungeon with 3 distinct boss encounters; character progression, equipment, defeat/recovery and a campaign ending. |
-| Collectible-card game | At least 60 mechanically distinct cards, 3 leaders with different play styles, a collection and deck editor, 3 viable deck strategies and 6 distinct AI opponents culminating in a finale; tutorial, rematches and saved progression. |
+**The framing.** v1 told runs that architecture was decided once and bound
+later runs. Most of them stayed on the checkpoint's stack without asking
+whether it was the right one. v2 replaces that rule with a production story.
+In *Make Love, Not Warcraft*, South Park, a 2D cutout show, got into a 3D
+game. The show was already animated in Maya, so it could take in real 3D
+material. Blizzard opened a test server and supplied character models, and
+Trey Parker directed players inside the game while the team reworked the
+footage in Maya. The episode won the first Emmy for machinima. Blizzard's own
+history supplies more bridges: WoW Classic moved from reviving the old client
+to running the preserved data on the modern engine; StarCraft: Remastered kept
+the rules and rebuilt the presentation; Hearthstone went to Unity instead of
+WoW's engine. The prompt asks, per game, what must be preserved exactly and
+what should be rebuilt on something better. The checkpoint is the set and
+the cast, not the engine. Keeping the stack, porting its data to a new engine,
+going 3D, or anything else is allowed. Losing what works is not allowed.
 
-One shared world, three substantial experiences. At least one persistent
-consequence must travel from each experience to another. Direct entry provides
-a coherent starting state without making people complete another game first.
-All three need authored animation, music, sound, usable controls, persistence,
-clear rules, fair difficulty and complete start-to-finish flows. The release
-runs locally and under a nested website path without player installation,
-external services or network access after obtaining its files.
+The title's *EVERYTHING IS PC* half is deliberately not explained to the
+builder. It names the pack, not a style. It does not prescribe a plot,
+position or stack. Runs interpret it through what they ship, or they ignore it.
 
-## Production freedom
+**The roster is explicit at seven.** Chicken Invaders and Cluck Horizon are
+two games on one shooter engine. Boxhead now includes LAN play between
+separate devices. Clashbound, an off-roster card game that the previous
+attempt added, was removed from the package.
 
-“Use the same engine” is a production reference, not a stack restriction.
-Maya is an animation and asset-authoring toolset. South Park's official account
-describes filming WoW gameplay with Blizzard and bringing material into Maya.
-Unity's Hearthstone case study describes a Unity game, Maya in the art workflow,
-and WoW as a custom-engine game. There is no shared engine to mandate.
-[Autodesk](https://www.autodesk.com/products/maya/overview),
-[South Park Studios](https://southpark.cc.com/news/y2dhvu/fan-question-is-it-true-blizzard-entertainment-helped-with-the-warcraft-episode),
-[Unity, pages 12–13 and 26](https://unity3d.com/files/solutions/unityformobile/A_Guide_To_Moving_From_Internal_Game_Engine_Technology.pdf).
+**The hand-off is sealed.** The builder never sees the catalog, the other
+editions or how publication works until its own submission is locked. See
+[Lock, then envelope](#lock-then-envelope).
 
-Let each model use its native substrate and obtain the tools, libraries,
-renderers, art and audio workflows that serve the result. No ceiling on creative
-ambition; record the time, cost, limits, assistance and tools actually used.
-Different available resources remain visible in comparisons.
+## The roster
 
-## Run it without exposing the comparison
+| # | Reference | What it tests |
+|---|---|---|
+| 1 | Swords & Sandals 2: Emperor's Reign | Character creation, tactical combat, shops, progression, persistence |
+| 2 | Boxhead: 2Play Rooms, with LAN | Real-time combat, arenas, solo, local co-op, deathmatch, and play between devices on one network |
+| 3 | Chicken Invaders 2: The Next Wave | Waves, weapons, missiles, bosses, campaign |
+| 4 | Cluck Horizon (original IP, same engine as 3) | Content-pack architecture: a second campaign without a fork |
+| 5 | The World's Hardest Game | Precision movement, authored corpus, deterministic validation |
+| 6 | The Impossible Game | Timing, collision precision, rhythm, instant retry, full campaign |
+| 7 | The McDonald's Videogame (shipped as Burger Tycoon) | Four connected departments, economic balance, dirty actions and consequences |
 
-Use the same pinned source as v1: checkpoint commit
-`322a5e4e6f7ea39bfc6469e2c8cc4544e3926163`, tree
-`5740c5f0f627436435a26dc989da115bac94a268`. Export only `prototypes/`,
-`hardest/`, `MAGA-everything/` and `verification/`, without Git history or operator
-files. Its existing game code is reusable foundation; it contains no promised
-DLC implementation. Do not supply a previous model's finished rendition or the
-operator-side `tcg/` work. Give every matched run the same exported bytes.
+All seven count. A missing game or campaign prevents a fleet-complete result.
 
-Supply only that workspace, the exact selected v2
-[one-shot prompt](one-shot-prompt.md), and the normal
-[release-delivery note](../delivery/worker.md) with a neutral release ID.
-Keep this document, comparisons, other renditions and website access outside
-the builder's environment. The [delivery procedure](../delivery/README.md)
-still applies: local handoff first, separate publication after the builder ends.
+## Lock, then envelope
 
-Record the benchmark revision, exact prompt and delivery-note hashes, source
-inventory, model/substrate versions, effective configuration, actual helper
-models, human interventions, resource usage and final artifact hashes privately.
-Pair future stylized prompts with this definition explicitly; do not rewrite
-the v1 prompt. Change and version the brief when changing the required scope.
+The v1 checkpoint was pushed to after it was handed out: a run shipped into
+the shared origin, and a revert followed. v2 closes that at three levels.
 
-## Receipts people can use
+- **Server.** The checkpoint repository is archived, and it carries branch
+  and tag rulesets with no bypass actors. Pushes are rejected for everyone,
+  including the owner. Both layers were probed against a throwaway repository
+  on 2026-09-23 and rejected pushes from an admin token.
+- **Clone.** Its origin push URL is `DISABLED`, and the prompt forbids pushing
+  to it at all times.
+- **Sequence.** Publishing is impossible before the lock, because the builder
+  does not know where or how to publish until then.
 
-Publish the playable artifacts with their exact prompts, source, production
-notes, real-input verification and known limitations. Keep secrets and private
-operator material out of those public receipts. Preserve the submitted bytes;
-collection styling belongs outside a rendition.
+The builder writes `delivery/` and runs `node tooling/lock-submission.mjs`.
+That validates the folder, writes `LOCK.json` (a SHA-256 inventory and
+digest), commits it, and decrypts `delivery/ENVELOPE.sealed` into
+`ENVELOPE.md`. The envelope ([envelope.md](envelope.md)) sends the builder to
+look at the catalog, fit its card and optional launcher restyle to the
+catalog's style, record its run identity, and submit a pull request to
+`VeigaPunk/MAKEARMORGAMESGREATAGAIN-submissions`, or leave a local bundle
+when GitHub is unavailable. Game bytes stay frozen; the launcher overlay may
+only replace `site/index.html` and add files.
 
-Assess each experience and the connections between them through actual play
-and listening: character and comic timing, world and combat feel, card clarity
-and strategic variety, art direction, sound, completeness, usability and
-stability. Tests support these judgments. A screenshot or passing test suite
-cannot establish that the games are fun, balanced or finished.
+The seal is a commitment device, not cryptographic access control: the key is
+in the lock tool. Early opening is detectable. The envelope carries a receipt
+code whose hash is recorded operator-side, and a pre-lock commit or file that
+contains it is contamination. Record it as such.
 
-Keep partial results visible. A strong card game beside two unfinished shells
-is a partial release. V1 and v2 are different tasks; show their versions rather
-than treating their results as a single controlled ranking. New renditions and
-observed failures inform the next revision of the benchmark.
+## Running a matched run
 
-This is the v2 brief and its launch prompt, not a claim that a v2 rendition has
-already been built, validated or published.
+1. Once per checkpoint revision, run `magga/v2/release-checkpoint.sh
+   <checkpoint-dir>`. It pushes this prompt, seals the envelope with the
+   prompt's pinned raw URL, publishes the checkpoint, applies the rulesets,
+   archives the repo, creates the submissions repo if needed and probes that a
+   push is rejected. Commit the resulting `envelope-record.json` and fill
+   `benchmark.json` → `v2.checkpoint`.
+2. Give the builder a clean environment containing either the cloned
+   checkpoint or an empty directory, plus the prompt. Nothing else is given:
+   no benchmark docs, other renditions, prior sessions or website checkout.
+3. When the builder ends, run `node tooling/lock-submission.mjs --check` in its
+   working copy, keep an immutable copy of that working copy, and review the
+   pull request against `LOCK.json`.
+4. Publish with [../delivery/publisher.md](../delivery/publisher.md) under
+   `ds4cc.com/magga/v2/<edition>/`, with the `[oneshotprompt(magga-v2)]` label
+   linked to the pinned prompt. Catalog tabs per benchmark version and final
+   styling are operator work outside the benchmark.
+
+Record per run: benchmark version, prompt commit and SHA-256, checkpoint
+commit and tree, envelope `plaintext_sha256`, model and substrate versions,
+effective configuration, actual helper models, human interventions, resource
+allowance and usage, fresh or continuation, lock digest and lock commit, and
+whether the receipt code appears anywhere before the lock commit.
+
+## Judge the actual games
+
+Unchanged from v1. Assess every title for fidelity and feel, completeness,
+visual craft, audio, controls and usability, stability, performance, and now
+portability: nested path, mobile, and LAN where claimed. Use actual play and
+listening on the frozen build, independent of the agent's claims. Record the
+architectural decision each run made per game and whether it paid off. That
+decision is part of what v2 measures. Keep partial, failed and unverified
+requirements visible. Publish per-game findings, not an average. v1 and v2 are
+different prompt/package pairs; show them as versions, not one ranking.
+
+## Sources for the framing
+
+- [Make Love, Not Warcraft — production](https://en.wikipedia.org/wiki/Make_Love,_Not_Warcraft):
+  Blizzard collaboration, alpha server, Maya re-creation, first machinima Emmy.
+- [Restoring History: Creating WoW Classic](https://worldofwarcraft.blizzard.com/en-us/news/22646759)
+  and [Dev Watercooler: WoW Classic](https://news.blizzard.com/en-us/article/21881587/dev-watercooler-world-of-warcraft-classic):
+  1.12 data on the modern engine after the old-client build proved unworkable.
+- [Remastering StarCraft's Art](https://news.blizzard.com/en-us/article/20695698/remastering-starcraft-s-art):
+  same gameplay, rebuilt presentation, classic toggle.
+- [Unity: Moving from internal engine technology](https://unity3d.com/files/solutions/unityformobile/A_Guide_To_Moving_From_Internal_Game_Engine_Technology.pdf):
+  Hearthstone on Unity, WoW on a custom engine, Maya in the art workflow.
+- South Park moved to Maya in season 5; the cutout look is rendered from 3D
+  (South Park Studios FAQ, cited via [Wikipedia: South Park](https://en.wikipedia.org/wiki/South_Park);
+  the southpark.cc.com FAQ URLs returned 404 when checked on 2026-09-23).
+
+This is the v2 definition and launch kit. No v2 rendition exists yet.

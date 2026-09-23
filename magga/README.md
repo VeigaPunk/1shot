@@ -43,9 +43,13 @@ confirmed the original one-shot was pushed. [That prompt](one-shot-prompt.md)
 is preserved byte-for-byte. This benchmark definition does not rewrite it.
 Exact source and prompt identities are in [benchmark.json](benchmark.json).
 
-The separately versioned [v2 DLC](v2/README.md), **EVERYTHING IS PC x Make Love
-Not Warcraft**, carries this essence into animated comedy, fantasy adventure
-and a collectible-card game. It has its own [one-shot prompt](v2/one-shot-prompt.md).
+[MAGGA v2](v2/README.md), **EVERYTHING IS PC x Make Love Not Warcraft**, is the
+next iteration. It has the same seven games (Chicken Invaders and Cluck Horizon
+count as two), Boxhead gains LAN play, and it ships a new checkpoint package,
+a new shared [one-shot prompt](v2/one-shot-prompt.md) and a sealed,
+lock-first publication hand-off. Its framing, how South Park got inside World
+of Warcraft, pushes runs to choose architecture per game on the merits
+instead of inheriting it.
 
 ## The challenge
 

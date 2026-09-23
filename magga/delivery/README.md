@@ -52,3 +52,15 @@ This keeps benchmark information out of the supplied build brief. It cannot
 erase a model's prior knowledge or guarantee blindness if the host exposes
 other sessions, directories, instructions or the collection. Enforce those
 boundaries in the launch environment.
+
+## MAGGA v2
+
+v2 replaces `worker.md` with a lock-first hand-off built into the checkpoint:
+`delivery/`, `tooling/lock-submission.mjs` and a sealed envelope. Give the
+builder only the checkpoint and [the v2 prompt](../v2/one-shot-prompt.md).
+The envelope sends finished runs to pull requests on
+`VeigaPunk/MAKEARMORGAMESGREATAGAIN-submissions`. Publish accepted ones with
+[publisher.md](publisher.md), using `magga/v2/<edition>/` as the path and
+`[oneshotprompt(magga-v2)]` as the label. The overlay in an edition's
+`launcher/` may replace `site/index.html` and add files; it may not change any
+other locked byte. Setup and protection: [../v2/README.md](../v2/README.md).

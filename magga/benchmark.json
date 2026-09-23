@@ -7,7 +7,12 @@
     "repository": "VeigaPunk/MAKEARMORGAMESGREATAGAIN",
     "commit": "322a5e4e6f7ea39bfc6469e2c8cc4544e3926163",
     "tree": "5740c5f0f627436435a26dc989da115bac94a268",
-    "game_paths": ["prototypes", "hardest", "MAGA-everything", "verification"],
+    "game_paths": [
+      "prototypes",
+      "hardest",
+      "MAGA-everything",
+      "verification"
+    ],
     "fresh_run": "Export the pinned game paths without Git history or operator configuration into an isolated workspace."
   },
   "original_prompt": {
@@ -25,5 +30,49 @@
     "resource_allowance_and_usage",
     "fresh_or_continuation",
     "artifact_sha256_inventory"
-  ]
+  ],
+  "v2": {
+    "version": "0.2.0",
+    "title": "EVERYTHING IS PC x Make Love Not Warcraft",
+    "definition": "v2/README.md",
+    "roster": [
+      "swords-and-sandals-2",
+      "boxhead-2play-rooms+lan",
+      "chicken-invaders-2",
+      "cluck-horizon",
+      "worlds-hardest-game",
+      "impossible-game",
+      "mcdonalds-videogame"
+    ],
+    "checkpoint": {
+      "repository": "VeigaPunk/MAKEARMORGAMESGREATAGAIN-v2",
+      "prepared_from": "VeigaPunk/MAKEARMORGAMESGREATAGAIN-codex@9d48e757a563704ad9266f1810d22f3efdd4cb55",
+      "commit": null,
+      "tree": null,
+      "tag": "checkpoint-v2",
+      "protection": [
+        "archived",
+        "branch ruleset: creation/update/deletion/non_fast_forward, no bypass",
+        "tag ruleset: creation/update/deletion, no bypass",
+        "clone push URL DISABLED"
+      ],
+      "note": "commit/tree are filled by release-checkpoint.sh output; sealing the envelope adds one commit on top of the prepared package"
+    },
+    "prompt": {
+      "path": "v2/one-shot-prompt.md",
+      "commit": null,
+      "sha256": "dbd8523fa3f3f453f779e1bc87952492691555b219e1b413bb4252c3ff1839c7"
+    },
+    "envelope": {
+      "template": "v2/envelope.md",
+      "record": "v2/envelope-record.json"
+    },
+    "submissions": "VeigaPunk/MAKEARMORGAMESGREATAGAIN-submissions",
+    "publication_path": "ds4cc.com/magga/v2/<edition>/",
+    "run_identity_extra": [
+      "envelope_plaintext_sha256",
+      "lock_digest_and_commit",
+      "receipt_seen_before_lock"
+    ]
+  }
 }
