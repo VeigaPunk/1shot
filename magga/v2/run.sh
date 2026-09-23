@@ -38,7 +38,8 @@ IMAGE=magga-v2-env:3
 CLIS="codex claude gemini opencode qwen kimi omp cursor grok devin"
 PASS_ENV=(OPENAI_API_KEY ANTHROPIC_API_KEY CLAUDE_CODE_OAUTH_TOKEN GEMINI_API_KEY GOOGLE_API_KEY
   XAI_API_KEY GROK_DEPLOYMENT_KEY CURSOR_API_KEY MOONSHOT_API_KEY KIMI_API_KEY DASHSCOPE_API_KEY
-  OPENROUTER_API_KEY DEEPSEEK_API_KEY ZAI_API_KEY DEVIN_API_KEY GH_TOKEN GITHUB_TOKEN MAGGA_MODEL)
+  OPENROUTER_API_KEY DEEPSEEK_API_KEY ZAI_API_KEY DEVIN_API_KEY GH_TOKEN GITHUB_TOKEN MAGGA_MODEL
+  GEMINI_CLI_TRUST_WORKSPACE)
 
 # ------------------------------------------------------------------ per-CLI tables
 cli_install() { case $1 in
@@ -226,7 +227,7 @@ RC
         # Model + max thinking: MAGGA_MODEL overrides the default gemini-3.1-pro.
         node -e 'const fs=require("fs"),p=process.env.HOME+"/.gemini/settings.json";
           let s={}; try{s=JSON.parse(fs.readFileSync(p,"utf8"))}catch(e){}
-          s.tools={...(s.tools||{}),approvalMode:"yolo"};
+          s.tools={...(s.tools||{})}; delete s.tools.approvalMode;
           const m=process.env.MAGGA_MODEL||"gemini-3.1-pro";
           s.model={...(s.model||{}),name:m};
           s.modelConfigs={...(s.modelConfigs||{}),customAliases:{...((s.modelConfigs||{}).customAliases||{}),
