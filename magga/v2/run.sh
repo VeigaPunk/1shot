@@ -35,7 +35,7 @@ VARIANTS_BASE=https://raw.githubusercontent.com/VeigaPunk/1shot/6011cd7918d4d0f9
 VARIANT_SHA_godspeed=b9e89b9f8f0cb8bc9f89ecd5918e450839c891970a28ad88adfcac660613ec76
 VARIANT_SHA_ufo=a4e1513c64715d46d61a8e4b8a3ffff827814f187d86aa587f6ab6e7eb8687a7
 IMAGE=magga-v2-env:3
-CLIS="codex claude gemini opencode qwen kimi omp cursor grok devin"
+CLIS="codex claude gemini opencode qwen kimi omp cursor grok devin antigravity"
 PASS_ENV=(OPENAI_API_KEY ANTHROPIC_API_KEY CLAUDE_CODE_OAUTH_TOKEN GEMINI_API_KEY GOOGLE_API_KEY
   XAI_API_KEY GROK_DEPLOYMENT_KEY CURSOR_API_KEY MOONSHOT_API_KEY KIMI_API_KEY DASHSCOPE_API_KEY
   OPENROUTER_API_KEY DEEPSEEK_API_KEY ZAI_API_KEY DEVIN_API_KEY GH_TOKEN GITHUB_TOKEN MAGGA_MODEL
@@ -54,9 +54,10 @@ cli_install() { case $1 in
   cursor)   curl -fsSL https://cursor.com/install | bash ;;
   grok)     curl -fsSL https://x.ai/cli/install.sh | bash ;;
   devin)    curl -fsSL https://cli.devin.ai/install.sh | bash ;;
+  antigravity) curl -fsSL https://antigravity.google/cli/install.sh | bash ;;
   shell)    : ;;
 esac; }
-cli_bin() { case $1 in cursor) echo cursor-agent ;; *) echo "$1" ;; esac; }
+cli_bin() { case $1 in cursor) echo cursor-agent ;; antigravity) echo agy ;; *) echo "$1" ;; esac; }
 # Launch argv; the message is the last argument. Every permission prompt is bypassed.
 cli_launch() { local p=$2; case $1 in
   codex)    LAUNCH=(codex --dangerously-bypass-approvals-and-sandbox "$p") ;;
@@ -69,12 +70,13 @@ cli_launch() { local p=$2; case $1 in
   cursor)   LAUNCH=(cursor-agent --yolo --trust --approve-mcps --sandbox disabled "$p") ;;
   grok)     LAUNCH=(grok --always-approve "$p") ;;
   devin)    LAUNCH=(devin --permission-mode dangerous --respect-workspace-trust false -- "$p") ;;
+  antigravity) LAUNCH=(agy --dangerously-skip-permissions --model "${MAGGA_MODEL:-gemini-3.1-pro-high}" --effort high --prompt-interactive "$p") ;;
   shell)    LAUNCH=(bash -l) ;;
 esac; }
 cli_bypass_flag() { case $1 in
   codex) echo dangerously-bypass-approvals-and-sandbox ;; claude) echo dangerously-skip-permissions ;;
   gemini|qwen) echo yolo ;; opencode) echo auto ;; omp) echo auto-approve ;; cursor) echo yolo ;;
-  grok) echo always-approve ;; devin) echo permission-mode ;; *) echo "" ;;
+  grok) echo always-approve ;; devin) echo permission-mode ;; antigravity) echo dangerously-skip-permissions ;; *) echo "" ;;
 esac; }
 # Login files, relative to $HOME. Configs, memories and sessions are never exported.
 cli_auth() { case $1 in
@@ -83,6 +85,7 @@ cli_auth() { case $1 in
   opencode) echo .local/share/opencode/auth.json ;; qwen) echo .qwen/oauth_creds.json ;;
   kimi) echo .kimi-code/credentials ;; cursor) echo .config/cursor/auth.json ;;
   grok) echo .grok/auth.json ;; devin) echo .local/share/devin/credentials.toml .config/devin/config.json ;;
+  antigravity) echo .config/agy/adc.json ;;
   *) echo "" ;;
 esac; }
 cli_login() { case $1 in
@@ -91,11 +94,12 @@ cli_login() { case $1 in
   cursor)   [ -n "${CURSOR_API_KEY:-}" ] || NO_OPEN_BROWSER=1 cursor-agent login ;;
   grok)     [ -n "${GROK_DEPLOYMENT_KEY:-}${XAI_API_KEY:-}" ] || grok login --device-auth ;;
   devin)    devin auth login ;;
+  antigravity) agy -p "say ok" ;;   # prints a URL and waits for the pasted code
   opencode) opencode auth login ;;
   *)        : ;;   # claude, gemini, qwen and omp sign in on their own first screen
 esac; }
 # Native skill locations, so each CLI discovers the variant's skills on its own.
-SKILL_DIRS=".agents/skills .claude/skills .omp/agent/skills .grok/skills .kimi-code/skills .config/opencode/skill .config/opencode/skills .cursor/skills .gemini/skills .qwen/skills .config/devin/skills"
+SKILL_DIRS=".agents/skills .claude/skills .omp/agent/skills .grok/skills .kimi-code/skills .config/opencode/skill .config/opencode/skills .cursor/skills .gemini/skills .qwen/skills .config/devin/skills .gemini/antigravity-cli/skills"
 
 # ------------------------------------------------------------------ credential bundle (host side)
 # bundle_add <dir> <cli>: copy one CLI's login into <dir>/<cli>/, deriving trimmed files where needed.
@@ -244,6 +248,11 @@ RC
   for f in $(cli_auth "$cli"); do [ -e "$HOME/$f" ] && have_auth=1; done
   [ "$cli" = omp ] && [ -f "$HOME/.omp/agent/agent.db" ] && have_auth=1
   for k in "${PASS_ENV[@]}"; do [ -n "${!k:-}" ] && have_auth=1; done
+  if [ "$cli" = antigravity ] && [ -f "$HOME/.config/agy/adc.json" ]; then
+    export GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/agy/adc.json"
+    grep -q GOOGLE_APPLICATION_CREDENTIALS "$HOME/.magga-env.sh" \
+      || printf 'export GOOGLE_APPLICATION_CREDENTIALS="%s/.config/agy/adc.json"\n' "$HOME" >>"$HOME/.magga-env.sh"
+  fi
   if [ "$cli" != shell ] && { [ "$login" = 1 ] || [ $have_auth = 0 ]; }; then echo "» signing in to $cli"; cli_login "$cli"; fi
   if [ "$cli" = kimi ]; then
     touch "$HOME/.kimi-code/config.toml"
