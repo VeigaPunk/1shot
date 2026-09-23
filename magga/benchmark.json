@@ -1,0 +1,29 @@
+{
+  "id": "ds4cc-MAGGA",
+  "name": "MAKE ARMORGAMES GREAT AGAIN",
+  "version": "0.1.0",
+  "definition": "README.md",
+  "checkpoint": {
+    "repository": "VeigaPunk/MAKEARMORGAMESGREATAGAIN",
+    "commit": "322a5e4e6f7ea39bfc6469e2c8cc4544e3926163",
+    "tree": "5740c5f0f627436435a26dc989da115bac94a268",
+    "game_paths": ["prototypes", "hardest", "MAGA-everything", "verification"],
+    "fresh_run": "Export the pinned game paths without Git history or operator configuration into an isolated workspace."
+  },
+  "original_prompt": {
+    "repository": "VeigaPunk/1shot",
+    "commit": "15118e3929e5e5d247a8135e88457857ca5254f1",
+    "path": "magga/one-shot-prompt.md",
+    "sha256": "f0e82b154f78149ccc03b8ffed6c8ac76921fcb3f98f6d3e283065a9258f75cc"
+  },
+  "run_identity": [
+    "benchmark_version",
+    "prompt_revision_and_sha256",
+    "source_snapshot",
+    "model_and_substrate_versions",
+    "configuration_and_actual_helper_models",
+    "resource_allowance_and_usage",
+    "fresh_or_continuation",
+    "artifact_sha256_inventory"
+  ]
+}
