@@ -81,7 +81,7 @@ cli_auth() { case $1 in
   gemini) echo .gemini/oauth_creds.json .gemini/google_accounts.json ;;
   opencode) echo .local/share/opencode/auth.json ;; qwen) echo .qwen/oauth_creds.json ;;
   kimi) echo .kimi-code/credentials ;; cursor) echo .config/cursor/auth.json ;;
-  grok) echo .grok/auth.json ;; devin) echo .local/share/devin/credentials.toml ;;
+  grok) echo .grok/auth.json ;; devin) echo .local/share/devin/credentials.toml .config/devin/config.json ;;
   *) echo "" ;;
 esac; }
 cli_login() { case $1 in
