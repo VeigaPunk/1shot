@@ -231,6 +231,8 @@ RC
           s.model={...(s.model||{}),name:m};
           s.modelConfigs={...(s.modelConfigs||{}),customAliases:{...((s.modelConfigs||{}).customAliases||{}),
             [m]:{modelConfig:{model:m,generateContentConfig:{thinkingConfig:{thinkingLevel:"HIGH"}}}}}};
+          if(!process.env.GEMINI_API_KEY&&!process.env.GOOGLE_API_KEY&&fs.existsSync(process.env.HOME+"/.gemini/oauth_creds.json"))
+            s.security={...(s.security||{}),auth:{selectedType:"oauth-personal"}};
           fs.writeFileSync(p,JSON.stringify(s,null,2))'
       else
         [ -f "$HOME/.$cli/settings.json" ] || printf '{"tools":{"approvalMode":"yolo"}}\n' >"$HOME/.$cli/settings.json"
