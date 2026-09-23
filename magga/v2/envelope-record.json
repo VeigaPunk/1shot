@@ -1,0 +1,8 @@
+{
+  "sealed_at": "2026-09-23T18:00:29.203Z",
+  "prompt_url": "https://raw.githubusercontent.com/VeigaPunk/1shot/2309d8dfb6be965579beb34232095ffe4af6a695/magga/v2/one-shot-prompt.md",
+  "envelope_template_sha256": "9761186b4bc797f42148a9a272389aa757e724673c8ed656afef61ca03f22514",
+  "plaintext_sha256": "0f3b3f1c31c9dcd6fee7846cff6abd243b3cb758b3034a6d43f49429d8f53f40",
+  "sealed_sha256": "b71ddfe5a174b1b4546cabda7c2c5557d1ead39c99c75e6d2cd00b12f20d3625",
+  "receipt_sha256": "5ddb098be830793f4d80b2ae39b7acc22e57a50d35e887b7fb2f5f1a0b7ed930"
+}

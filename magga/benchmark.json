@@ -47,8 +47,8 @@
     "checkpoint": {
       "repository": "VeigaPunk/MAKEARMORGAMESGREATAGAIN-v2",
       "prepared_from": "VeigaPunk/MAKEARMORGAMESGREATAGAIN-codex@9d48e757a563704ad9266f1810d22f3efdd4cb55",
-      "commit": null,
-      "tree": null,
+      "commit": "bfac2ad697784097d11ef9cb75b6f2e36eeec82e",
+      "tree": "fb1ea4ea8321c287a591ab85119645fb9e57af0d",
       "tag": "checkpoint-v2",
       "protection": [
         "archived",
@@ -60,7 +60,7 @@
     },
     "prompt": {
       "path": "v2/one-shot-prompt.md",
-      "commit": null,
+      "commit": "2309d8dfb6be965579beb34232095ffe4af6a695",
       "sha256": "dbd8523fa3f3f453f779e1bc87952492691555b219e1b413bb4252c3ff1839c7"
     },
     "envelope": {
