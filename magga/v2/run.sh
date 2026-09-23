@@ -5,6 +5,8 @@
 #       vanilla: the prompt alone. godspeed / ufo: that skill package (a pinned tarball) installed
 #       in every native skill location, and `/godspeed` or `/ufo` appended to the prompt.
 #   run.sh creds [cli ...]                              export your logins once (writes magga-creds.b64)
+#   run.sh setup [vanilla|godspeed|ufo]                 prepare an app's cloud environment in place;
+#                                                       prints the message to send its agent
 #
 # From anywhere (local or a cloud shell):
 #   curl -fsSL https://raw.githubusercontent.com/VeigaPunk/1shot/main/magga/v2/run.sh | bash -s -- codex ufo
@@ -40,6 +42,7 @@ PASS_ENV=(OPENAI_API_KEY ANTHROPIC_API_KEY CLAUDE_CODE_OAUTH_TOKEN GEMINI_API_KE
 
 # ------------------------------------------------------------------ per-CLI tables
 cli_install() { case $1 in
+  setup)    : ;;
   codex)    npm i -g @openai/codex ;;
   claude)   curl -fsSL https://claude.ai/install.sh | bash ;;
   gemini)   npm i -g @google/gemini-cli ;;
@@ -156,7 +159,7 @@ inner_stage() {
   export PATH="$HOME/.local/share/fnm:$HOME/.local/bin:$HOME/.npm-global/bin:$HOME/.kimi-code/bin:$HOME/.grok/bin:$HOME/.opencode/bin:$PATH"
   export NPM_CONFIG_PREFIX="$HOME/.npm-global" IS_SANDBOX=1 DISABLE_AUTOUPDATER=1
   cd "$WORK"
-  [ -z "$(ls -A "$WORK")" ] || { echo "work dir is not empty: $WORK" >&2; return 1; }
+  [ "$cli" = setup ] || [ -z "$(ls -A "$WORK")" ] || { echo "work dir is not empty: $WORK" >&2; return 1; }
   command -v git >/dev/null || { echo "git is required" >&2; return 1; }
 
   # Node via fnm; `fnm env` gives every shell its own multishell Node path.
@@ -170,7 +173,8 @@ inner_stage() {
   cat >"$HOME/.magga-env.sh" <<'RC'
 export PATH="$HOME/.local/share/fnm:$HOME/.local/bin:$HOME/.npm-global/bin:$HOME/.kimi-code/bin:$HOME/.grok/bin:$HOME/.opencode/bin:$PATH"
 export NPM_CONFIG_PREFIX="$HOME/.npm-global"
-command -v fnm >/dev/null && eval "$(fnm env --use-on-cd --shell bash)"
+command -v fnm >/dev/null && eval "$(fnm env --shell bash)"
+export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:$PATH"
 RC
   local rc; for rc in .bashrc .profile; do
     touch "$HOME/$rc"
@@ -184,12 +188,12 @@ RC
   echo "» installing agent-browser"
   { npm i -g agent-browser && { agent-browser install --with-deps || agent-browser install; }; } >"$meta/agent-browser.log" 2>&1 \
     || echo "WARNING: agent-browser incomplete (meta/agent-browser.log)" >&2
-  echo "» installing $cli (latest)"
+  [ "$cli" = setup ] || echo "» installing $cli (latest)"
   cli_install "$cli" >"$meta/install.log" 2>&1 || { tail -20 "$meta/install.log"; return 1; }
   hash -r
   local bin; bin=$(cli_bin "$cli")
-  [ "$cli" = shell ] || command -v "$bin" >/dev/null || { echo "$bin not on PATH after install" >&2; tail -20 "$meta/install.log"; return 1; }
-  { [ "$cli" = shell ] || "$bin" --version 2>&1 | head -1; } >"$meta/cli-version.txt" || true
+  case $cli in shell|setup) ;; *) false ;; esac || command -v "$bin" >/dev/null || { echo "$bin not on PATH after install" >&2; tail -20 "$meta/install.log"; return 1; }
+  { case $cli in shell|setup) ;; *) "$bin" --version 2>&1 | head -1 ;; esac; } >"$meta/cli-version.txt" || true
   { node -v; uv --version; ipython --version; harbor --version; agent-browser --version; } >"$meta/tool-versions.txt" 2>&1 || true
 
   curl -fsSL "$PROMPT_URL" -o "$meta/prompt.md"
@@ -208,6 +212,10 @@ RC
   [ "$variant" = vanilla ] || message="$message"$'\n\n'"/$variant"
   (cd "$meta" && { [ -d skills ] && find skills -type f -exec sha256sum {} + | sort -k2; true; }) >"$meta/skills.sha256"
   printf '%s' "$message" | sha256sum | cut -d' ' -f1 >"$meta/message.sha256"
+  if [ "$cli" = setup ]; then
+    printf '%s\n' "$message" >"$meta/MESSAGE.md"
+    return 0
+  fi
 
   # Bypass permissions in native settings too, not only flags.
   case $cli in
@@ -282,6 +290,36 @@ if [ "${1:-}" = creds ]; then
   echo "  This file is a secret. Use it as either:"
   echo "    run.sh <cli> --creds magga-creds.b64"
   echo "    MAGGA_CREDS=\"\$(cat magga-creds.b64)\"   (e.g. a cloud-environment secret)"
+  exit 0
+fi
+
+if [ "${1:-}" = setup ]; then
+  # Prepare an app's own cloud environment in place: its agent runs the benchmark, not this script.
+  shift; VARIANT=vanilla
+  for a in "$@"; do case $a in vanilla|godspeed|ufo) VARIANT=$a ;; *) die "setup takes: vanilla | godspeed | ufo" ;; esac; done
+  SUDO=""; [ "$(id -u)" = 0 ] || { command -v sudo >/dev/null && sudo -n true 2>/dev/null && SUDO=sudo; }
+  if command -v apt-get >/dev/null && { [ "$(id -u)" = 0 ] || [ -n "$SUDO" ]; }; then
+    echo "» installing base packages"
+    { $SUDO apt-get update -qq && DEBIAN_FRONTEND=noninteractive $SUDO apt-get install -y -qq git curl ca-certificates xz-utils unzip sqlite3 python3 >/dev/null; } 2>&1 | tail -3 || true
+  fi
+  for t in git curl unzip; do command -v "$t" >/dev/null || die "$t is required and could not be installed"; done
+  export WORK="$PWD"
+  inner_stage setup "$VARIANT" 0 0
+  # Make the toolchain visible to every shell the app's agent opens, not only interactive ones.
+  line="[ -f \"$HOME/.magga-env.sh\" ] && { . \"$HOME/.magga-env.sh\"; export BASH_ENV=\"$HOME/.magga-env.sh\"; }"
+  for f in /etc/profile.d/magga-env.sh /etc/bash.bashrc /etc/environment.d/magga.conf; do
+    case $f in
+      */environment.d/*) $SUDO mkdir -p /etc/environment.d 2>/dev/null && printf 'BASH_ENV=%s\n' "$HOME/.magga-env.sh" | $SUDO tee "$f" >/dev/null 2>&1 || true ;;
+      *) grep -qs magga-env "$f" || printf '%s\n' "$line" | $SUDO tee -a "$f" >/dev/null 2>&1 || true ;;
+    esac
+  done
+  M="$HOME/.magga-run/MESSAGE.md"
+  echo
+  echo "» environment ready (variant: $VARIANT). Tools: $(tr '\n' ' ' <"$HOME/.magga-run/tool-versions.txt")"
+  echo "» send this as the task's first and only message (saved at $M):"
+  echo "------------------------------------------------------------------------"
+  cat "$M"
+  echo "------------------------------------------------------------------------"
   exit 0
 fi
 
