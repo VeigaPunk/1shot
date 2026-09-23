@@ -29,7 +29,7 @@ set -euo pipefail
 
 PROMPT_URL=https://raw.githubusercontent.com/VeigaPunk/1shot/2309d8dfb6be965579beb34232095ffe4af6a695/magga/v2/one-shot-prompt.md
 PROMPT_SHA=dbd8523fa3f3f453f779e1bc87952492691555b219e1b413bb4252c3ff1839c7
-VARIANTS_BASE=https://raw.githubusercontent.com/VeigaPunk/1shot/main/magga/v2/variants
+VARIANTS_BASE=https://raw.githubusercontent.com/VeigaPunk/1shot/6011cd7918d4d0f937c0011791b67120a04581ef/magga/v2/variants
 VARIANT_SHA_godspeed=b9e89b9f8f0cb8bc9f89ecd5918e450839c891970a28ad88adfcac660613ec76
 VARIANT_SHA_ufo=a4e1513c64715d46d61a8e4b8a3ffff827814f187d86aa587f6ab6e7eb8687a7
 IMAGE=magga-v2-env:3
