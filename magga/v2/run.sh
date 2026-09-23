@@ -2,6 +2,8 @@
 # MAGGA v2 — one command per benchmark run.
 #
 #   run.sh <cli> [vanilla|godspeed|ufo] [options]      start a run
+#       vanilla: the prompt alone. godspeed / ufo: that skill package (a pinned tarball) installed
+#       in every native skill location, and `/godspeed` or `/ufo` appended to the prompt.
 #   run.sh creds [cli ...]                              export your logins once (writes magga-creds.b64)
 #
 # From anywhere (local or a cloud shell):
@@ -27,8 +29,10 @@ set -euo pipefail
 
 PROMPT_URL=https://raw.githubusercontent.com/VeigaPunk/1shot/2309d8dfb6be965579beb34232095ffe4af6a695/magga/v2/one-shot-prompt.md
 PROMPT_SHA=dbd8523fa3f3f453f779e1bc87952492691555b219e1b413bb4252c3ff1839c7
-SKILLS_BASE=https://raw.githubusercontent.com/VeigaPunk/1shot/main/magga/v2/variants
-IMAGE=magga-v2-env:2
+VARIANTS_BASE=https://raw.githubusercontent.com/VeigaPunk/1shot/main/magga/v2/variants
+VARIANT_SHA_godspeed=b9e89b9f8f0cb8bc9f89ecd5918e450839c891970a28ad88adfcac660613ec76
+VARIANT_SHA_ufo=a4e1513c64715d46d61a8e4b8a3ffff827814f187d86aa587f6ab6e7eb8687a7
+IMAGE=magga-v2-env:3
 CLIS="codex claude gemini opencode qwen kimi omp cursor grok devin"
 PASS_ENV=(OPENAI_API_KEY ANTHROPIC_API_KEY CLAUDE_CODE_OAUTH_TOKEN GEMINI_API_KEY GOOGLE_API_KEY
   XAI_API_KEY GROK_DEPLOYMENT_KEY CURSOR_API_KEY MOONSHOT_API_KEY KIMI_API_KEY DASHSCOPE_API_KEY
@@ -88,8 +92,6 @@ cli_login() { case $1 in
 esac; }
 # Native skill locations, so each CLI discovers the variant's skills on its own.
 SKILL_DIRS=".agents/skills .claude/skills .omp/agent/skills .grok/skills .kimi-code/skills .config/opencode/skill .config/opencode/skills .cursor/skills .gemini/skills .qwen/skills .config/devin/skills"
-variant_skills() { case $1 in godspeed) echo godspeed ;; ufo) echo "ufo godspeed wwkd" ;; *) echo "" ;; esac; }
-UFO_FILES="SKILL.md references/CHANGELOG.md references/run-logic.md references/godspeed-core/directive.md references/godspeed-core/filter.md references/godspeed-core/velocity.md"
 
 # ------------------------------------------------------------------ credential bundle (host side)
 # bundle_add <dir> <cli>: copy one CLI's login into <dir>/<cli>/, deriving trimmed files where needed.
@@ -171,7 +173,8 @@ export NPM_CONFIG_PREFIX="$HOME/.npm-global"
 command -v fnm >/dev/null && eval "$(fnm env --use-on-cd --shell bash)"
 RC
   local rc; for rc in .bashrc .profile; do
-    grep -q magga-env "$HOME/$rc" 2>/dev/null || { printf '[ -f "$HOME/.magga-env.sh" ] && . "$HOME/.magga-env.sh"\n' | cat - "$HOME/$rc" 2>/dev/null >"$HOME/$rc.new"; mv "$HOME/$rc.new" "$HOME/$rc"; }
+    touch "$HOME/$rc"
+    grep -q magga-env "$HOME/$rc" || { printf '[ -f "$HOME/.magga-env.sh" ] && . "$HOME/.magga-env.sh"\n' | cat - "$HOME/$rc" >"$HOME/$rc.new"; mv "$HOME/$rc.new" "$HOME/$rc"; }
   done
   export BASH_ENV="$HOME/.magga-env.sh" ENV="$HOME/.magga-env.sh"
 
@@ -193,17 +196,15 @@ RC
   echo "$PROMPT_SHA  $meta/prompt.md" | sha256sum -c --quiet - || { echo "prompt checksum mismatch" >&2; return 1; }
   local message; message=$(cat "$meta/prompt.md")
 
-  # Variant: install the skill package(s) in every native skill location, then invoke by name.
-  local s f d
-  for s in $(variant_skills "$variant"); do
-    local src="$meta/skills/$s"; mkdir -p "$src"
-    case $s in
-      ufo) for f in $UFO_FILES; do mkdir -p "$src/$(dirname "$f")"; curl -fsSL "$SKILLS_BASE/ufo/skills/ufo/$f" -o "$src/$f"; done ;;
-      godspeed) for f in SKILL.md directive.md; do curl -fsSL "$SKILLS_BASE/godspeed/skills/godspeed/$f" -o "$src/$f"; done ;;
-      wwkd) curl -fsSL "$SKILLS_BASE/ufo/skills/wwkd/SKILL.md" -o "$src/SKILL.md" ;;
-    esac
-    for d in $SKILL_DIRS; do mkdir -p "$HOME/$d"; cp -r "$src" "$HOME/$d/"; done
-  done
+  # Variant: one pinned tarball of skill packages, installed in every native skill location.
+  if [ "$variant" != vanilla ]; then
+    local tgz="$meta/magga-v2-$variant.tar.gz" want d s
+    want=$(eval echo "\$VARIANT_SHA_$variant")
+    curl -fsSL "$VARIANTS_BASE/magga-v2-$variant.tar.gz" -o "$tgz"
+    echo "$want  $tgz" | sha256sum -c --quiet - || { echo "variant tarball checksum mismatch" >&2; return 1; }
+    mkdir -p "$meta/skills" && tar -xzf "$tgz" -C "$meta/skills"
+    for d in $SKILL_DIRS; do mkdir -p "$HOME/$d"; for s in "$meta/skills"/*/; do cp -r "$s" "$HOME/$d/"; done; done
+  fi
   [ "$variant" = vanilla ] || message="$message"$'\n\n'"/$variant"
   (cd "$meta" && { [ -d skills ] && find skills -type f -exec sha256sum {} + | sort -k2; true; }) >"$meta/skills.sha256"
   printf '%s' "$message" | sha256sum | cut -d' ' -f1 >"$meta/message.sha256"
@@ -215,7 +216,7 @@ RC
     gemini|qwen) mkdir -p "$HOME/.$cli"; [ -f "$HOME/.$cli/settings.json" ] || printf '{"tools":{"approvalMode":"yolo"}}\n' >"$HOME/.$cli/settings.json" ;;
   esac
 
-  local have_auth=0 k
+  local have_auth=0 k f
   for f in $(cli_auth "$cli"); do [ -e "$HOME/$f" ] && have_auth=1; done
   [ "$cli" = omp ] && [ -f "$HOME/.omp/agent/agent.db" ] && have_auth=1
   for k in "${PASS_ENV[@]}"; do [ -n "${!k:-}" ] && have_auth=1; done
@@ -319,7 +320,7 @@ if [ $LOGIN = 0 ] && [ "$CLI" != shell ]; then
   [ -d "$AUTH/$CLI" ] && echo "» $CLI login: $(cd "$AUTH/$CLI" && find . -type f | sed 's|^\./|~/|' | tr '\n' ' ')"
 fi
 touch "$AUTH/env"
-FUNCS="$(declare -p PROMPT_URL PROMPT_SHA SKILLS_BASE PASS_ENV SKILL_DIRS UFO_FILES); $(declare -f cli_install cli_bin cli_launch cli_bypass_flag cli_auth cli_login variant_skills inner_stage)"
+FUNCS="$(declare -p PROMPT_URL PROMPT_SHA VARIANTS_BASE VARIANT_SHA_godspeed VARIANT_SHA_ufo PASS_ENV SKILL_DIRS); $(declare -f cli_install cli_bin cli_launch cli_bypass_flag cli_auth cli_login inner_stage)"
 
 record() {
   local meta=$1
@@ -337,10 +338,12 @@ if [ "$MODE" = docker ]; then
     docker build -q -t "$IMAGE" - <<'DOCKERFILE' >/dev/null
 FROM node:24-bookworm
 RUN apt-get update && apt-get install -y --no-install-recommends sudo ripgrep jq unzip xz-utils less sqlite3 \
-    python3 python3-venv python3-pip build-essential ca-certificates \
+    python3 python3-venv python3-pip build-essential ca-certificates iproute2 procps \
  && rm -rf /var/lib/apt/lists/* && echo 'node ALL=(ALL) NOPASSWD:ALL' >/etc/sudoers.d/node && chmod 0440 /etc/sudoers.d/node \
  && mkdir /work && chown node:node /work
 USER node
+ENV BASH_ENV=/home/node/.magga-env.sh \
+    PATH=/home/node/.local/share/fnm:/home/node/.local/bin:/home/node/.npm-global/bin:/home/node/.kimi-code/bin:/home/node/.grok/bin:/home/node/.opencode/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 WORKDIR /work
 DOCKERFILE
   fi
