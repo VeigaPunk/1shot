@@ -108,6 +108,25 @@ in the lock tool. Early opening is detectable. The envelope carries a receipt
 code whose hash is recorded operator-side, and a pre-lock commit or file that
 contains it is contamination. Record it as such.
 
+## Launching runs
+
+`magga/v2/run.sh` starts one clean run with one command, locally or in a cloud shell:
+
+```bash
+# once, on the machine that is signed in: export its logins (a secret file)
+bash magga/v2/run.sh creds
+# each run: <cli> [vanilla|godspeed|ufo]
+curl -fsSL https://raw.githubusercontent.com/VeigaPunk/1shot/main/magga/v2/run.sh | bash -s -- codex ufo --creds magga-creds.b64
+```
+
+It gives each run a fresh privileged Docker container, or an isolated home directory when Docker is
+missing. Inside it installs the toolchain (Node via fnm, uv, IPython, Harbor, agent-browser) and the
+latest CLI, copies in only that CLI's login, checks the pinned prompt and the variant tarball against
+their SHA-256, and bypasses every permission prompt. When the run ends it writes `run.json` plus the
+lock and envelope-peek checks. The variant is recorded in each run's identity: `vanilla` is the prompt
+alone; `godspeed` and `ufo` install that skill package (`variants/*.tar.gz`) and append `/godspeed`
+or `/ufo` to the message.
+
 ## Running a matched run
 
 1. Once per checkpoint revision, run `magga/v2/release-checkpoint.sh
