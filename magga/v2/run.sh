@@ -38,7 +38,7 @@ IMAGE=magga-v2-env:3
 CLIS="codex claude gemini opencode qwen kimi omp cursor grok devin"
 PASS_ENV=(OPENAI_API_KEY ANTHROPIC_API_KEY CLAUDE_CODE_OAUTH_TOKEN GEMINI_API_KEY GOOGLE_API_KEY
   XAI_API_KEY GROK_DEPLOYMENT_KEY CURSOR_API_KEY MOONSHOT_API_KEY KIMI_API_KEY DASHSCOPE_API_KEY
-  OPENROUTER_API_KEY DEEPSEEK_API_KEY ZAI_API_KEY DEVIN_API_KEY GH_TOKEN GITHUB_TOKEN)
+  OPENROUTER_API_KEY DEEPSEEK_API_KEY ZAI_API_KEY DEVIN_API_KEY GH_TOKEN GITHUB_TOKEN MAGGA_MODEL)
 
 # ------------------------------------------------------------------ per-CLI tables
 cli_install() { case $1 in
@@ -78,7 +78,7 @@ esac; }
 # Login files, relative to $HOME. Configs, memories and sessions are never exported.
 cli_auth() { case $1 in
   codex) echo .codex/auth.json ;; claude) echo .claude/.credentials.json ;;
-  gemini) echo .gemini/oauth_creds.json .gemini/google_accounts.json ;;
+  gemini) echo .gemini/oauth_creds.json .gemini/google_accounts.json .gemini/settings.json ;;
   opencode) echo .local/share/opencode/auth.json ;; qwen) echo .qwen/oauth_creds.json ;;
   kimi) echo .kimi-code/credentials ;; cursor) echo .config/cursor/auth.json ;;
   grok) echo .grok/auth.json ;; devin) echo .local/share/devin/credentials.toml .config/devin/config.json ;;
@@ -221,7 +221,20 @@ RC
   case $cli in
     codex)  mkdir -p "$HOME/.codex"; printf 'approval_policy = "never"\nsandbox_mode = "danger-full-access"\n' >>"$HOME/.codex/config.toml" ;;
     claude) mkdir -p "$HOME/.claude"; printf '{"permissions":{"defaultMode":"bypassPermissions"},"skipDangerousModePermissionPrompt":true}\n' >"$HOME/.claude/settings.json" ;;
-    gemini|qwen) mkdir -p "$HOME/.$cli"; [ -f "$HOME/.$cli/settings.json" ] || printf '{"tools":{"approvalMode":"yolo"}}\n' >"$HOME/.$cli/settings.json" ;;
+    gemini|qwen) mkdir -p "$HOME/.$cli"
+      if [ "$cli" = gemini ] && command -v node >/dev/null; then
+        # Model + max thinking: MAGGA_MODEL overrides the default gemini-3.1-pro.
+        node -e 'const fs=require("fs"),p=process.env.HOME+"/.gemini/settings.json";
+          let s={}; try{s=JSON.parse(fs.readFileSync(p,"utf8"))}catch(e){}
+          s.tools={...(s.tools||{}),approvalMode:"yolo"};
+          const m=process.env.MAGGA_MODEL||"gemini-3.1-pro";
+          s.model={...(s.model||{}),name:m};
+          s.modelConfigs={...(s.modelConfigs||{}),customAliases:{...((s.modelConfigs||{}).customAliases||{}),
+            [m]:{modelConfig:{model:m,generateContentConfig:{thinkingConfig:{thinkingLevel:"HIGH"}}}}}};
+          fs.writeFileSync(p,JSON.stringify(s,null,2))'
+      else
+        [ -f "$HOME/.$cli/settings.json" ] || printf '{"tools":{"approvalMode":"yolo"}}\n' >"$HOME/.$cli/settings.json"
+      fi ;;
   esac
 
   local have_auth=0 k f
